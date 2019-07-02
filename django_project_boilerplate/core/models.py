@@ -33,6 +33,11 @@ LABEL_CHOICES = (
     ('s' , 'secondary'),
     ('d' , 'danger'),
 )
+
+ADDRESS_CHOICES = (
+    ('s' , 'shipping'),
+    ('b' , 'billing'),
+)
 class Item(models.Model):
     title = models.CharField(max_length = 20)
     price = models.IntegerField()
@@ -106,6 +111,20 @@ class Order(models.Model):
             total += order_item.final_price()
         return total
 
+class Address(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE)
+    street_address = models.CharField(max_length = 50)
+    apartment_address = models.CharField(max_length = 50)
+    country = models.CharField(max_length = 50)
+    zip_code  = models.CharField(max_length = 20)
+    address_type = models.CharField(max_length = 1 , choices = ADDRESS_CHOICES)
+    default = models.BooleanField(default = False)
+
+    def  __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name_plural = 'Addesses'
 
 def unique_slug_genaretor_reciever(instance , sender , *args , **kwargs):
     if not instance.slug:
